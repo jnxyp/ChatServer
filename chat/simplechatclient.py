@@ -1,5 +1,5 @@
 # coding=utf-8
-from __future__ import print_function
+# from __future__ import print_function
 
 import socket
 import threading
@@ -73,6 +73,7 @@ class SimpleChatClient(object):
         self.add_cmd(Command('?', self.get_cmd_list, Command.LOCAL))
         self.add_cmd(Command('setusers', self.set_user_nicks, Command.SERVER))
         # TODO self.add_cmd(Command('updateusers'))
+
     def connect(self):
         # Connect to server
         try:
@@ -92,13 +93,13 @@ class SimpleChatClient(object):
         self._msg_send_thread.start()
         print('%s thread activated.' % self._msg_send_thread.name)
 
-    def send_raw(self, str_msg:str):
+    def send_raw(self, str_msg: str):
         try:
             self._sock.sendall(str_msg.encode('utf-8'))
         except socket.error as e:
             print('Error occurred while sending message to server.')
 
-    def send(self, msg:Message):
+    def send(self, msg: Message):
         self.send_raw(repr(msg))
 
     def send_thread_process(self):
@@ -111,7 +112,7 @@ class SimpleChatClient(object):
                 else:
                     self.send(msg)
 
-    def recv_raw(self, size: int=DEFAULT_RECEIVING_SIZE) -> str or None:
+    def recv_raw(self, size: int = DEFAULT_RECEIVING_SIZE) -> str or None:
         try:
             return str(self._sock.recv(size), 'utf-8')
         except socket.error as e:
@@ -136,7 +137,7 @@ class SimpleChatClient(object):
     def get_console_input(self):
         return input()
 
-    def process_input(self, s:str):
+    def process_input(self, s: str):
         # type: (str) -> None
         # if input is a command, execute it
         if s.startswith(COMMAND_PREFIX):
@@ -191,7 +192,7 @@ class SimpleChatClient(object):
                                  'Message': result})
                             self._send_buffer.append(msg)
 
-    def verify_execution(self, msg:Message, cmd:Command) -> bool:
+    def verify_execution(self, msg: Message, cmd: Command) -> bool:
         executer = msg.get_field('Sender')
         if executer == SERVER_UID and cmd.level <= Command.SERVER:
             return True
@@ -201,7 +202,7 @@ class SimpleChatClient(object):
             return True
         return False
 
-    def execute_cmd(self, cmd:Command, params:list=None) -> str:
+    def execute_cmd(self, cmd: Command, params: list = None) -> str:
         try:
             if params is None or type(params) is not list:
                 return repr(cmd.execute())
@@ -220,20 +221,20 @@ class SimpleChatClient(object):
         else:  # Unknown type message
             self._handle_unknow_type_msg(msg)
 
-    def _handle_unknow_type_msg(self, msg:Message):
+    def _handle_unknow_type_msg(self, msg: Message):
         if not msg.get_field('Type') in self._unknow_type_msg_storage.keys():
             self._unknow_type_msg_storage[msg.get_field('Type')] = [msg]
         else:
             self._unknow_type_msg_storage.get(msg.get_field('Type')).append(msg)
 
-    def disp_msg(self, msg:Message) -> None:
+    def disp_msg(self, msg: Message) -> None:
         sender = self._users.get(msg.get_field('Sender'))
         nick = ''
         if sender is not None and self._users.get(sender) is not None:
             nick = self._users.get(sender)
-        print('[%d]%s: %s' % (sender, nick, msg.get_field('Message'))) # Expected
+        print('[%d]%s: %s' % (sender, nick, msg.get_field('Message')))  # Expected
 
-    def set_uid(self, uid:int or str) -> None:
+    def set_uid(self, uid: int or str) -> None:
         # (This function was used by a command)
         uid = int(uid)
         if uid == SERVER_UID or uid == GUEST_UID:
@@ -245,26 +246,27 @@ class SimpleChatClient(object):
         # (This function was used by a command)
         return self._uid
 
-    def get_cmd_list(self) -> {str:Command}:
+    def get_cmd_list(self) -> {str: Command}:
         # (This function was used by a command)
         cmds = {}
         for cmd in self._commands:
             cmds[cmd.cmd_ref] = cmd
         return cmds
 
-    def set_user_nicks(self, users:dict or str) -> None:
+    def set_user_nicks(self, users: dict or str) -> None:
         # (This function was used by a command)
         if type(users) == str:
             users = literal_eval(users)
         self._users = users
 
-    def get_user_nick(self, uid:int = None) -> str or None:
+    def get_user_nick(self, uid: int = None) -> str or None:
         if uid == None:
             uid = self.get_uid()
         return self._users.get(uid)
 
-    def add_cmd(self, cmd:Command):
+    def add_cmd(self, cmd: Command):
         self._commands.append(cmd)
+
 
 client = SimpleChatClient('localhost', 10086)
 client.connect()
