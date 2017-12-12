@@ -4,7 +4,8 @@ from __future__ import print_function
 import socket
 import threading
 
-from src.socket_test.chat.util import *
+from chat.command import Command
+from chat.message import Message
 
 COMMAND_MSG_TYPE = 'Cmd'
 MESSAGE_MSG_TYPE = 'Msg'

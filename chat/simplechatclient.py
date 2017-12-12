@@ -5,7 +5,8 @@ import socket
 import threading
 from ast import literal_eval
 
-from src.socket_test.chat.util import *
+from chat.command import Command
+from chat.message import Message
 
 COMMAND_MSG_TYPE = 'Cmd'
 MESSAGE_MSG_TYPE = 'Msg'
